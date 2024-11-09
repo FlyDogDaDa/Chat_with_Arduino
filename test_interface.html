@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Test Interface</title>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        margin: 0;
+      }
+
+      #chat-container {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden; /* 隱藏水平捲軸 */
+        padding: 10px;
+        display: flex;
+        flex-direction: column-reverse;
+      }
+
+      .message {
+        display: flex;
+        margin-bottom: 10px;
+      }
+
+      .user-message {
+        justify-content: flex-end;
+      }
+
+      .bot-message {
+        justify-content: flex-start;
+      }
+
+      .message-bubble {
+        padding: 10px;
+        border-radius: 10px;
+        max-width: 70%;
+        animation: slideIn 0.5s ease-in-out;
+      }
+
+      .user-message-bubble {
+        background-color: #dcf8c6;
+        animation: userSlideIn 0.3s ease-in-out;
+      }
+
+      .bot-message-bubble {
+        background-color: #fff;
+      }
+
+      #input-container {
+        display: flex;
+        padding: 10px;
+      }
+
+      #textInput {
+        flex: 1;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      #sendButton {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #25d366;
+        color: #fff;
+        cursor: pointer;
+        margin-left: 10px;
+        position: relative;
+      }
+
+      #loading {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        border-radius: 5px;
+        z-index: 9999;
+        animation: fadeIn 0.2s forwards, fadeOut 0.5s reverse forwards;
+      }
+
+      #loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 4px solid #3498db;
+        width: 30px;
+        height: 30px;
+        animation: spin 2s linear infinite;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
+
+      @keyframes spin {
+        0% {
+          transform: translate(-50%, -50%) rotate(0deg);
+        }
+        100% {
+          transform: translate(-50%, -50%) rotate(360deg);
+        }
+      }
+
+      @keyframes slideIn {
+        0% {
+          transform: translateX(-100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes userSlideIn {
+        0% {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+        100% {
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat-container"></div>
+
+    <div id="input-container">
+      <input type="text" id="textInput" />
+      <button id="sendButton">Send</button>
+      <div id="loading">
+        <div id="loading-spinner"></div>
+      </div>
+    </div>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "@google/generative-ai": "https://esm.run/@google/generative-ai"
+        }
+      }
+    </script>
+
+    <script type="module">
+      import {
+        sendMessage,
+        convertToTraditionalChinese,
+      } from "./message_handler.js"; //TODO:arduino上的引用方法
+      import { addMessage, handleLoading, clearInput } from "./ui_updater.js";
+
+      //使用者送出事件
+      textInput.addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+          handleSendMessage();
+        }
+      });
+      sendButton.addEventListener("click", async () => {
+        handleSendMessage();
+      });
+
+      async function handleSendMessage() {
+        const message = textInput.value;
+        addMessage("user", message);
+        clearInput();
+
+        handleLoading("block");
+
+        const botResponse = await sendMessage(message);
+        addMessage("bot", botResponse);
+
+        handleLoading("none");
+      }
+    </script>
+  </body>
+</html>

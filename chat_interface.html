@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Chat Interface</title>
+    <title>Test Interface</title>
     <style>
       body {
         display: flex;
@@ -167,78 +167,11 @@
     </script>
 
     <script type="module">
-      const chatContainer = document.getElementById("chat-container");
-      const loading = document.getElementById("loading");
-      const sendButton = document.getElementById("sendButton");
-      const textInput = document.getElementById("textInput");
-
-      const API_KEY = "AIzaSyDpGRXVqMS8NH-izfhVJ4K08yReX142EE8";
-
-      const { GoogleGenerativeAI } = await import("@google/generative-ai");
-      const genAI = new GoogleGenerativeAI(API_KEY);
-      const model = genAI.getGenerativeModel({
-        model: "gemini-1.5-flash-latest",
-      });
-
-      const opencc = await import(
-        "https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/cn2t.js"
-      );
-
-      //LLM的對話訊息生成
-      let chatHistory = [];
-      const chat = model.startChat({ history: chatHistory });
-      async function sendMessage(message) {
-        chatHistory.push({ role: "user", parts: [{ text: message }] });
-        const result = await chat.sendMessage(message);
-        //const convertedResponse = await convertToTraditionalChinese(
-        //  botResponse
-        //);
-        chatHistory.push({
-          role: "model",
-          parts: [{ text: result.response.text() }],
-        });
-        return result.response.text();
-      }
-      //聊天室介面的訊息添加
-      function addMessage(sender, content) {
-        const messageElement = document.createElement("div");
-        messageElement.classList.add("message", `${sender}-message`);
-
-        const messageBubble = document.createElement("div");
-        messageBubble.classList.add(
-          "message-bubble",
-          `${sender}-message-bubble`
-        );
-
-        // 呼叫 Markdown 轉換函式
-        messageBubble.innerHTML = content;
-
-        messageElement.appendChild(messageBubble);
-        chatContainer.prepend(messageElement);
-
-        return messageElement;
-      }
-
-      async function convertToTraditionalChinese(text) {
-        const converter = opencc.Converter({ from: "cn", to: "twp" });
-        return converter(text);
-      }
-
-      //處理AI訊息生成
-      async function handleSendMessage() {
-        const message = textInput.value;
-        addMessage("user", message);
-        textInput.value = "";
-
-        loading.style.display = "block";
-        sendButton.disabled = true;
-
-        const botResponse = await sendMessage(message);
-        addMessage("bot", botResponse);
-
-        loading.style.display = "none";
-        sendButton.disabled = false;
-      }
+      import {
+        sendMessage,
+        convertToTraditionalChinese,
+      } from "./message_handler.js"; //TODO:arduino上的引用方法
+      import { addMessage, handleLoading, clearInput } from "./ui_updater.js";
 
       //使用者送出事件
       textInput.addEventListener("keydown", async (event) => {
@@ -249,6 +182,19 @@
       sendButton.addEventListener("click", async () => {
         handleSendMessage();
       });
+
+      async function handleSendMessage() {
+        const message = textInput.value;
+        addMessage("user", message);
+        clearInput();
+
+        handleLoading("block");
+
+        const botResponse = await sendMessage(message);
+        addMessage("bot", botResponse);
+
+        handleLoading("none");
+      }
     </script>
   </body>
 </html>

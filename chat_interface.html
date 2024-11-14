@@ -45,7 +45,7 @@
       }
 
       .bot-message-bubble {
-        background-color: #fff;
+        background-color: #ffefef;
       }
 
       #input-container {
@@ -95,6 +95,34 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+      }
+
+      #recordButton {
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #f44336;
+        color: #fff;
+        cursor: pointer;
+        margin-left: 10px;
+        position: relative;
+      }
+
+      #recordButton.recording {
+        background-color: #ff9800;
+        animation: pulse 1s infinite;
+      }
+
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(1);
+        }
       }
 
       @keyframes spin {
@@ -153,6 +181,7 @@
     <div id="input-container">
       <input type="text" id="textInput" />
       <button id="sendButton">Send</button>
+      <button id="recordButton">Record</button>
       <div id="loading">
         <div id="loading-spinner"></div>
       </div>
@@ -169,7 +198,11 @@
     <script type="module">
       import {
         sendMessage,
-        convertToTraditionalChinese,
+        invoke,
+        stopRecording,
+        startRecording,
+        isRecording,
+        transcribeAudio,
       } from "./message_handler.js"; //TODO:arduino上的引用方法
       import { addMessage, handleLoading, clearInput } from "./ui_updater.js";
 
@@ -190,11 +223,34 @@
 
         handleLoading("block");
 
-        const botResponse = await sendMessage(message);
+        sendMessage(message);
+        const botResponse = await invoke();
+
         addMessage("bot", botResponse);
 
         handleLoading("none");
       }
+
+      async function handleRecording() {
+        if (!isRecording()) {
+          console.log("開始錄音");
+          startRecording();
+          //await new Promise((resolve) => setTimeout(resolve, 250)); // 等待1000毫秒（1秒）
+          recordButton.classList.add("recording");
+        } else {
+          console.log("結束錄音");
+          recordButton.classList.remove("recording");
+          handleLoading("block");
+          await stopRecording();
+          const convert_text = await transcribeAudio();
+          textInput.value = convert_text;
+          await handleSendMessage();
+        }
+      }
+      const recordButton = document.getElementById("recordButton");
+      const loading = document.getElementById("loading");
+
+      recordButton.addEventListener("click", handleRecording);
     </script>
   </body>
 </html>

@@ -79,7 +79,7 @@
 
       async function handleRecording() {
         if (!isRecording()) {
-          startRecording();
+          await startRecording();
           //await new Promise((resolve) => setTimeout(resolve, 250)); // 等待1000毫秒（1秒）
           recordButton.classList.add("recording");
         } else {

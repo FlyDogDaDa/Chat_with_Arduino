@@ -1,0 +1,283 @@
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  background-color: #ffffff; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#chat-container {
+  flex: 1;
+  overflow-y: hidden;
+  overflow-x: hidden; 
+  padding: 20px; /* 放大內邊距 */
+  display: flex;
+  flex-direction: column-reverse;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.message {
+  display: flex;
+  margin-bottom: 20px; /* 放大外邊距 */
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.user-message {
+  justify-content: flex-end;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.bot-message {
+  justify-content: flex-start;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.message-bubble {
+  padding: 20px; /* 放大內邊距 */
+  border-radius: 15px; /* 放大圓角 */
+  max-width: 80%; /* 放大寬度 */
+  animation: slideIn 0.5s ease-in-out;
+  background-color: #e8e8e8;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.user-message-bubble {
+  background-color: #dcfed4; 
+  animation: userSlideIn 0.3s ease-in-out;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+.bot-message-bubble {
+  background-color: #ffeded; 
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#input-container {
+  display: flex;
+  padding: 20px; /* 放大內邊距 */
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#textInput {
+  flex: 1;
+  padding: 15px; /* 放大內邊距 */
+  border: 2px solid #ccc; /* 放大邊框 */
+  border-radius: 10px; /* 放大圓角 */
+  background-color: #fff; 
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#sendButton {
+  padding: 15px; /* 放大內邊距 */
+  border: none;
+  border-radius: 10px; /* 放大圓角 */
+  background-color: #7fb481;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 20px; /* 放大外邊距 */
+  position: relative;
+  transition: transform 0.2s ease; 
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#sendButton:active {
+  transform: scale(0.95);
+}
+
+#loading {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  z-index: 9999;
+  animation: fadeIn 0.2s forwards, fadeOut 0.5s reverse forwards;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+}
+
+#loading-spinner {
+  border: 4px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 4px solid #3498db;
+  width: 40px; /* 放大寬度 */
+  height: 40px; /* 放大高度 */
+  animation: spin 2s linear infinite;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+}
+
+#recordButton {
+  padding: 15px; /* 放大內邊距 */
+  border: none;
+  border-radius: 10px; /* 放大圓角 */
+  background-color: #f67e75;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 20px; /* 放大外邊距 */
+  position: relative;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#recordButton.recording {
+  background-color: #ffc671;
+  animation: pulse 1s infinite;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes userSlideIn {
+  0% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+#back-button {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 15px; /* 放大內邊距 */
+  background-color: #d7e2e6; 
+  border-radius: 10px; /* 放大圓角 */
+  cursor: pointer;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#back-button a {
+  text-decoration: none;
+  color: #000;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#back-button svg {
+  width: 30px; /* 放大寬度 */
+  height: 30px; /* 放大高度 */
+  fill: #000;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+}
+
+#toggleVoiceButton {
+  padding: 15px; /* 放大內邊距 */
+  border: none;
+  border-radius: 10px; /* 放大圓角 */
+  background-color: #c0ecd1; 
+  color: black;
+  cursor: pointer;
+  margin-right: 20px; /* 放大外邊距 */
+  transition: background-color 0.3s ease;
+  font-family: 'San Francisco', 'Helvetica Neue', Roboto, Arial, sans-serif; 
+  font-size: 1.2em; /* 放大字體大小 */
+}
+
+#toggleVoiceButton:hover {
+  background-color: #b6e6c8
+}
+
+#toggleVoiceButton.enabled {
+  background-color: #c0ecd1; 
+}
+
+#toggleVoiceButton.disabled {
+  background-color: #febaba; 
+}
+
+#input-container {
+  display: flex;
+  padding: 20px;
+  margin-left: 20px;
+}
+
+#textInput {
+  flex: 1;
+  padding: 15px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+#sendButton {
+  padding: 15px;
+  border: none;
+  border-radius: 10px;
+  background-color: #7fb481;
+  color: #fff;
+  cursor: pointer;
+  margin-left: 20px;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+

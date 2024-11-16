@@ -117,25 +117,25 @@ let audioChunks = [];
 export function isRecording() {
   return mediaRecorder != null;
 }
+let stream = null;
+try {
+  stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+} catch (err) {
+  console.error("無法取得麥克風權限：", err);
+  alert("無法取得麥克風權限"); // 新增彈出訊息
+}
 
-export function startRecording() {
+export async function startRecording() {
   audioChunks = [];
-  navigator.mediaDevices
-    .getUserMedia({ audio: true })
-    .then((stream) => {
-      mediaRecorder = new MediaRecorder(stream);
-      mediaRecorder.ondataavailable = handleDataAvailable;
-      mediaRecorder.start();
-    })
-    .catch((err) => {
-      console.error("無法取得麥克風權限：", err);
-      alert("無法取得麥克風權限"); // 新增彈出訊息
-    });
+  mediaRecorder = new MediaRecorder(stream);
+  mediaRecorder.ondataavailable = handleDataAvailable;
+  mediaRecorder.start();
 }
 
 function handleDataAvailable(event) {
-  console.log(event.data.size);
-  if (event.data.size > 0) {
+  let size = event.data.size;
+  // console.log("獲得啟用的音訊，長度: ", size);
+  if (size > 0) {
     audioChunks.push(event.data);
   }
 }
@@ -161,33 +161,37 @@ export async function transcribeAudio() {
   // 使用 Gemini 轉錄音訊
   //將對話歷史記錄轉換為適當的格式
   const historyString = chatHistory
-    .map((item) => `${item.role}: ${item.parts[0].text}`)
+    .map((item) => JSON.stringify(item))
     .join("\t");
 
-  console.log(audioChunks);
   const audioBlob = new Blob(audioChunks, { type: "audio/mp3" });
   const base64String = await blobToBase64(audioBlob);
 
   const prompt = [
-    { text: "使用者麥克風錄音【音訊開始】" },
+    { text: "Chat context (ignorable):" },
+    {
+      text: historyString
+        ? historyString
+        : "(This is the first speech so there is no context)",
+    },
+    { text: "*The speech begins*" },
     {
       inlineData: {
         mimeType: "audio/mp3",
         data: base64String,
       },
     },
-    { text: "【音訊結束】\n" },
+    { text: "*The speech is over*" },
+    { text: "speech usually is 中文(zh-TW)." },
+    { text: "Please ignore all non-speaking sounds." },
+    { text: "卡芙萊 is model name." },
     {
-      text:
-        "額外對話脈絡(上下文)僅供參考：「\n" +
-        historyString +
-        "\n」脈絡結束，目前輪到使用者說話。\n\n",
+      text: "You can't make things up, you have to type the speech exactly as it is.",
     },
     {
-      text: "轉錄音訊內容。",
+      text: "Provide a transcript of the speech.",
     },
   ];
-  console.log(prompt);
   const result = await ASR_model.generateContent(prompt);
   const convert_text = converter(result.response.text());
   return convert_text;

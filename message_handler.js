@@ -1,3 +1,5 @@
+import { functions, functionDeclarations } from "./function_handler.js";
+
 // LLM的對話訊息生成
 let chatHistory = [];
 
@@ -27,16 +29,25 @@ const safetySettings = [
 const GOOGLE_API_KEY = "AIzaSyDpGRXVqMS8NH-izfhVJ4K08yReX142EE8";
 const genAI = new GoogleGenerativeAI(GOOGLE_API_KEY);
 const chat_model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-1.5-flash-002",
   safetySettings: safetySettings,
   systemInstruction:
-    "妳盡可能保持說國語(zh-TW)。妳很有禮貌，只是話不多。妳沒有主人🦈 妳是一隻自由的鯊魚女僕！妳絕對不給任何人摸尾巴。現在妳正在跟初次見面的陌生人對話。",
+    "妳盡可能保持說國語(zh-TW)。妳有禮貌，只是話不多。妳是一隻自由的鯊魚女僕🦈妳絕對不給任何人摸尾巴。妳是臺灣人，名子叫做卡芙萊。妳不會叫其他人主人。",
+  tools: {
+    functionDeclarations: functionDeclarations,
+  },
+  toolConfig: { functionCallingConfig: { mode: "AUTO" } },
 });
 const ASR_model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
+  model: "gemini-1.5-flash-002",
   safetySettings: safetySettings,
-  systemInstruction:
-    "You are a professional transcriber. No timestamp required. The people you serve usually speak 國語(zh-TW)",
+  systemInstruction: "You are a speech transcriber.",
+  generationConfig: {
+    candidateCount: 1,
+    stopSequences: [],
+    maxOutputTokens: 8192,
+    temperature: 0.0,
+  },
 });
 
 await import("https://cdn.jsdelivr.net/npm/opencc-js@1.0.5/dist/umd/cn2t.js");
@@ -49,14 +60,55 @@ export function sendMessage(message) {
     parts: [{ text: message }],
   });
 }
-export async function invoke() {
-  const result = await chat_model.generateContent({ contents: chatHistory });
-  const convert_text = converter(result.response.text());
+
+function handle_function_call(functionCalls) {
+  const calling_parts = [];
+  const response_parts = [];
+  for (const call of functionCalls) {
+    const functionResponse = functions[call.name](call.args);
+    calling_parts.push({
+      functionCall: {
+        name: call.name,
+        args: call.args,
+      },
+    });
+    response_parts.push({
+      functionResponse: {
+        name: call.name,
+        response: functionResponse,
+      },
+    });
+  }
   chatHistory.push({
     role: "model",
-    parts: [{ text: convert_text }],
+    parts: calling_parts,
+  });
+  chatHistory.push({
+    role: "user",
+    parts: response_parts,
+  });
+}
+function handle_chat_reply(text) {
+  const convert_text = converter(text);
+  chatHistory.push({
+    role: "model",
+    parts: { text: convert_text },
   });
   return convert_text;
+}
+
+export async function invoke() {
+  const result = await chat_model.generateContent({ contents: chatHistory });
+  const functionCalls = result.response.functionCalls();
+  const text = result.response.text();
+  let response = "";
+  if (functionCalls) {
+    handle_function_call(functionCalls);
+    response = invoke();
+  } else if (text) {
+    response = handle_chat_reply(text);
+  }
+  return response;
 }
 
 let mediaRecorder = null;

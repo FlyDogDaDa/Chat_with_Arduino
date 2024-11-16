@@ -16,6 +16,7 @@
     <div id="chat-container"></div>
 
     <div id="input-container">
+      <button id="toggleVoiceButton">Voice</button>
       <input type="text" id="textInput" />
       <button id="sendButton">Send</button>
       <button id="recordButton">Record</button>
@@ -42,6 +43,13 @@
         transcribeAudio,
       } from "./message_handler.js"; //TODO:arduino上的引用方法
       import { addMessage, handleLoading, clearInput } from "./ui_updater.js";
+      import { functions, functionDeclarations } from "./function_handler.js";
+      import {
+        speak,
+        enableVoice,
+        disableVoice,
+        isVoiceEnabled,
+      } from "./tts_handler.js";
 
       //使用者送出事件
       textInput.addEventListener("keydown", async (event) => {
@@ -64,6 +72,7 @@
         const botResponse = await invoke();
 
         addMessage("bot", botResponse);
+        speak(botResponse);
 
         handleLoading("none");
       }
@@ -84,6 +93,11 @@
       }
       const recordButton = document.getElementById("recordButton");
       const loading = document.getElementById("loading");
+
+      toggleVoiceButton.addEventListener("click", () => {
+        if (isVoiceEnabled) disableVoice();
+        else enableVoice();
+      });
 
       recordButton.addEventListener("click", handleRecording);
     </script>

@@ -6,7 +6,8 @@
   </head>
   <body>
     <div id="back-button">
-      <a href="Please change the URL of the control link">
+      <!-- Please change the URL of the control link -->
+      <a href="/">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
           <path d="M18 25l-12-8 12-8M 25-8h10" />
         </svg>
@@ -69,12 +70,10 @@
 
       async function handleRecording() {
         if (!isRecording()) {
-          console.log("開始錄音");
           startRecording();
           //await new Promise((resolve) => setTimeout(resolve, 250)); // 等待1000毫秒（1秒）
           recordButton.classList.add("recording");
         } else {
-          console.log("結束錄音");
           recordButton.classList.remove("recording");
           handleLoading("block");
           await stopRecording();

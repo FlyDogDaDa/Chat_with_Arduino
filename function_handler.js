@@ -11,6 +11,7 @@ function openLed() {
   console.log("Arduino控制器：打開 LED");
   //發送開燈請求
   var xhr = new XMLHttpRequest();
+  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", on_led_url, false);
   try {
     xhr.send();
@@ -29,6 +30,7 @@ function openLed() {
 function closeLed() {
   console.log("Arduino控制器：關閉 LED");
   var xhr = new XMLHttpRequest();
+  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", off_led_url, false);
   try {
     xhr.send();
@@ -49,6 +51,7 @@ function getTemperatureHumidity() {
   console.log("Arduino控制器：獲取溫溼度");
   //
   var xhr = new XMLHttpRequest();
+  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", get_temperature_url, false);
   try {
     xhr.send();

@@ -11,10 +11,10 @@ function openLed() {
   console.log("Arduino控制器：打開 LED");
   //發送開燈請求
   var xhr = new XMLHttpRequest();
-  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", on_led_url, false);
   try {
     xhr.send();
+    return "LED is turned on";
     if (xhr.status == 200) {
       return "LED is turned on";
     } else {
@@ -30,10 +30,10 @@ function openLed() {
 function closeLed() {
   console.log("Arduino控制器：關閉 LED");
   var xhr = new XMLHttpRequest();
-  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", off_led_url, false);
   try {
     xhr.send();
+    return "LED is turned off";
     if (xhr.status == 200) {
       return "LED is turned off";
     } else {
@@ -51,22 +51,21 @@ function getTemperatureHumidity() {
   console.log("Arduino控制器：獲取溫溼度");
   //
   var xhr = new XMLHttpRequest();
-  xhr.timeout = 500; // 設置超時時間
   xhr.open("GET", get_temperature_url, false);
   try {
     xhr.send();
     if (xhr.status != 200) {
-      console.error("關燈請求失敗");
+      console.error("溫濕度請求失敗");
     }
+    const dataArray = xhr.responseText.split(",");
+    // 將陣列中的元素轉換為浮點數
+    const temperature = parseFloat(dataArray[0]);
+    const humidity = parseFloat(dataArray[1]);
+    return { temperature, humidity };
   } catch (error) {
     console.error("請求發生錯誤:", error);
     return "Failed to get temperature";
   }
-  const dataArray = xhr.responseText.split(",");
-  // 將陣列中的元素轉換為浮點數
-  const temperature = parseFloat(dataArray[0]);
-  const humidity = parseFloat(dataArray[1]);
-  return { temperature, humidity };
 }
 
 const openLedFunctionDeclaration = {

@@ -2,7 +2,7 @@ import { enableVoice, disableVoice } from "./tts_handler.js";
 
 const on_led_url = "http://192.168.211.54/onLed";
 const off_led_url = "http://192.168.211.54/offLed";
-const get_temperature_url = "http://192.168.211.54/onLed";
+const get_temperature_url = "http://192.168.211.54/get_temperature_text";
 
 /**
 //打開 LED。

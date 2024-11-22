@@ -83,10 +83,11 @@ function handle_function_call(functionCalls) {
     role: "model",
     parts: calling_parts,
   });
-  chatHistory.push({
-    role: "user",
-    parts: response_parts,
-  });
+  //TODO:恢復使用
+  //chatHistory.push({
+  //  role: "user",
+  //  parts: response_parts,
+  //});
 }
 function handle_chat_reply(text) {
   const convert_text = converter(text);
@@ -104,7 +105,7 @@ export async function invoke() {
   let response = "";
   if (functionCalls) {
     handle_function_call(functionCalls);
-    response = invoke();
+    response = handle_chat_reply("*函式呼叫觸發*"); //TODO: invoke();
   } else if (text) {
     response = handle_chat_reply(text);
   }

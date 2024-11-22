@@ -14,15 +14,14 @@ function openLed() {
   xhr.open("GET", on_led_url, false);
   try {
     xhr.send();
-    return "LED is turned on";
     if (xhr.status == 200) {
       return "LED is turned on";
     } else {
-      console.log("開燈請求失敗");
+      console.error("開燈請求失敗");
       return "Failed to turn on LED";
     }
   } catch (error) {
-    console.log("請求發生錯誤:", error);
+    console.error("請求發生錯誤:", error);
     return "Failed to turn on LED";
   }
 }
@@ -33,15 +32,14 @@ function closeLed() {
   xhr.open("GET", off_led_url, false);
   try {
     xhr.send();
-    return "LED is turned off";
     if (xhr.status == 200) {
       return "LED is turned off";
     } else {
-      console.log("關燈請求失敗");
+      console.error("關燈請求失敗");
       return "Failed to turn off LED";
     }
   } catch (error) {
-    console.log("請求發生錯誤:", error);
+    console.error("請求發生錯誤:", error);
     return "Failed to turn off LED";
   }
 }
@@ -55,7 +53,7 @@ function getTemperatureHumidity() {
   try {
     xhr.send();
     if (xhr.status != 200) {
-      console.log("溫濕度請求失敗");
+      console.error("溫濕度請求失敗");
     }
     const dataArray = xhr.responseText.split(",");
     // 將陣列中的元素轉換為浮點數

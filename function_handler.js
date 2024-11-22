@@ -1,12 +1,71 @@
 import { enableVoice, disableVoice } from "./tts_handler.js";
 
+const on_led_url = "http://192.168.211.54/onLed";
+const off_led_url = "http://192.168.211.54/offLed";
+const get_temperature_url = "http://192.168.211.54/onLed";
+
 /**
 //打開 LED。
  */
 function openLed() {
   console.log("Arduino控制器：打開 LED");
-  return true;
+  //發送開燈請求
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", on_led_url, false);
+  try {
+    xhr.send();
+    if (xhr.status == 200) {
+      return "LED is turned on";
+    } else {
+      console.error("開燈請求失敗");
+      return "Failed to turn on LED";
+    }
+  } catch (error) {
+    console.error("請求發生錯誤:", error);
+    return "Failed to turn on LED";
+  }
 }
+//關閉 LED。
+function closeLed() {
+  console.log("Arduino控制器：關閉 LED");
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", off_led_url, false);
+  try {
+    xhr.send();
+    if (xhr.status == 200) {
+      return "LED is turned off";
+    } else {
+      console.error("關燈請求失敗");
+      return "Failed to turn off LED";
+    }
+  } catch (error) {
+    console.error("請求發生錯誤:", error);
+    return "Failed to turn off LED";
+  }
+}
+
+//獲得溫溼度。
+function getTemperatureHumidity() {
+  console.log("Arduino控制器：獲取溫溼度");
+  //
+  var xhr = new XMLHttpRequest();
+  xhr.open("GET", get_temperature_url, false);
+  try {
+    xhr.send();
+    if (xhr.status != 200) {
+      console.error("關燈請求失敗");
+    }
+  } catch (error) {
+    console.error("請求發生錯誤:", error);
+    return "Failed to get temperature";
+  }
+  const dataArray = xhr.responseText.split(",");
+  // 將陣列中的元素轉換為浮點數
+  const temperature = parseFloat(dataArray[0]);
+  const humidity = parseFloat(dataArray[1]);
+  return { temperature, humidity };
+}
+
 const openLedFunctionDeclaration = {
   name: "openLed",
   parameters: {
@@ -23,11 +82,6 @@ const openLedFunctionDeclaration = {
   },
 };
 
-//關閉 LED。
-function closeLed() {
-  console.log("Arduino控制器：關閉 LED");
-  return false;
-}
 const closeLedFunctionDeclaration = {
   name: "closeLed",
   parameters: {
@@ -43,15 +97,6 @@ const closeLedFunctionDeclaration = {
     required: [],
   },
 };
-
-//獲得溫溼度。
-function getTemperatureHumidity() {
-  console.log("Arduino控制器：獲取溫溼度");
-  // 這裡先用假資料代替
-  const temperature = 25;
-  const humidity = 60;
-  return { temperature, humidity };
-}
 
 const getTemperatureHumidityFunctionDeclaration = {
   name: "getTemperatureHumidity",
